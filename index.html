@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>무효 클레임차트 요청</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#E3E7EC; --sheet:#FFFFFF; --ink:#16202E; --ink-2:#55606F; --rule:#CDD3DB;
+  --mark:#C8232C; --done:#1E6B4F; --wait:#9A6A00;
+  --serif:"Noto Serif KR",serif; --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--desk);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere;padding:40px 16px 64px}
+.sheet{max-width:720px;margin:0 auto;background:var(--sheet);box-shadow:0 1px 0 #c3cad3,0 18px 40px -24px rgba(22,32,46,.45);padding:40px 48px 44px}
+@media (max-width:600px){body{padding:0}.sheet{padding:28px 20px 36px;box-shadow:none;min-height:100vh}}
+.bib{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:3px double var(--ink);padding-bottom:10px;font-size:13px;color:var(--ink-2)}
+.inid{font-variant-numeric:tabular-nums;color:var(--ink-2);margin-right:6px}
+h1{font:900 clamp(28px,5vw,40px)/1.25 var(--serif);letter-spacing:-.01em;margin:26px 0 8px}
+.lede{margin:0 0 30px;color:var(--ink-2);max-width:34em}
+
+.mark{position:relative;border:2px solid var(--mark);padding:18px 18px 16px;margin-top:22px}
+.mark .tag{position:absolute;top:-13px;left:12px;background:var(--sheet);color:var(--mark);font:600 13px/1 var(--sans);padding:6px 7px}
+.row{display:flex;gap:10px}
+@media (max-width:600px){.row{flex-direction:column}}
+input{font:500 22px/1.2 var(--sans);font-variant-numeric:tabular-nums;color:var(--ink);border:0;border-bottom:1.5px solid var(--rule);padding:8px 2px;flex:1;min-width:0;background:transparent;border-radius:0}
+input::placeholder{color:#A6AEB8}
+input:focus{outline:none;border-bottom-color:var(--ink)}
+input.bad{border-bottom-color:var(--mark)}
+.who{margin-top:22px}
+.who label{display:block;font-size:13.5px;color:var(--ink-2)}
+.who input{font-size:17px;max-width:320px;width:100%}
+button{font:600 16px/1 var(--sans);color:#fff;background:var(--ink);border:0;padding:15px 22px;cursor:pointer;white-space:nowrap}
+button:hover{background:#2A3850}
+button:disabled{background:#8A94A1;cursor:default}
+button.ghost{background:none;color:var(--ink-2);padding:0;font:500 14px var(--sans)}
+button.ghost:hover{color:var(--ink);background:none}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
+.hint{font-size:13.5px;color:var(--ink-2);margin:10px 2px 0}
+.hint.err{color:var(--mark)}
+
+.mine{margin-top:40px}
+.mine h2{font:600 15px/1 var(--serif);margin:0 0 6px}
+.mine a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none;font-variant-numeric:tabular-nums}
+.mine a:hover{background:#F5F7F9}
+.chip{font-size:13px;padding:3px 9px;border:1.5px solid currentColor;white-space:nowrap;color:var(--ink-2)}
+.chip.pending,.chip.approved{color:var(--wait)}
+.chip.running{color:var(--mark)}
+.chip.done{color:var(--done)}
+
+.job-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-top:20px}
+.job-head h1{margin:6px 0 4px}
+.meta{color:var(--ink-2);font-size:14px;font-variant-numeric:tabular-nums}
+.stamp{flex:none;width:96px;height:96px;border:3px solid var(--mark);border-radius:50%;color:var(--mark);display:grid;place-items:center;font:900 19px/1.15 var(--serif);text-align:center;transform:rotate(-12deg);opacity:0}
+.stamp.show{animation:stamp .5s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes stamp{from{opacity:0;transform:rotate(-12deg) scale(1.6)}to{opacity:.9;transform:rotate(-12deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.stamp.show{animation:none;opacity:.9}}
+
+ol.track{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);margin:30px 0 0;padding:0;counter-reset:t}
+ol.track li{counter-increment:t;position:relative;padding-top:34px;font-size:14px;color:#9AA3AE;text-align:center}
+ol.track li::before{content:counter(t);position:absolute;top:0;left:50%;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;border:2px solid var(--rule);background:var(--sheet);font:600 12px/22px var(--sans);color:#9AA3AE;z-index:1}
+ol.track li::after{content:"";position:absolute;top:12px;left:-50%;width:100%;height:2px;background:var(--rule)}
+ol.track li:first-child::after{display:none}
+ol.track li.done{color:var(--ink-2)}
+ol.track li.done::before{content:"✓";background:var(--ink);border-color:var(--ink);color:#fff}
+ol.track li.done::after,ol.track li.now::after{background:var(--ink)}
+ol.track li.now{color:var(--ink);font-weight:600}
+ol.track li.now::before{border-color:var(--mark);color:var(--mark)}
+ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
+
+.state{margin:28px 0 0;padding:18px 20px;border-left:4px solid var(--rule);background:#F5F7F9;min-height:20px}
+.state:empty{display:none}
+.state b{display:block;font-size:17px;margin-bottom:2px}
+.state.waiting{border-left-color:var(--wait);background:#FBF6EA}
+.state.running{border-left-color:var(--mark);background:#FBF1F1}
+.state.done{border-left-color:var(--done);background:#EEF6F2}
+.state.off{border-left-color:var(--ink-2)}
+.sub{margin-top:10px;font-size:14px;color:var(--ink-2)}
+.bar{height:4px;background:#E7DADB;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--mark);transition:width .6s ease}
+
+.files{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.files:empty{display:none}
+.files a{display:inline-flex;align-items:baseline;gap:10px;background:var(--done);color:#fff;text-decoration:none;font-weight:600;padding:15px 20px}
+.files a:hover{background:#17573F}
+.files a small{font-weight:400;opacity:.8;font-size:13px}
+.files a.pdf{background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.files a.pdf:hover{background:#F3F5F8}
+
+.keep{margin-top:26px;font-size:14px;color:var(--ink-2);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.keep code{font:13px/1.4 ui-monospace,Consolas,monospace;background:#F3F5F8;padding:6px 8px;word-break:break-all}
+.keep button{font-size:13px;padding:7px 11px;background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--rule)}
+
+.summary{margin-top:36px;border-top:3px double var(--ink);padding-top:6px}
+.summary h2,.summary h3,.summary h4{font:600 17px/1.4 var(--serif);margin:22px 0 6px}
+.summary p,.summary li{font-size:15px;max-width:40em}
+.summary ul{padding-left:20px;margin:6px 0}
+.summary table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 4px;font-variant-numeric:tabular-nums}
+.summary th,.summary td{border-bottom:1px solid var(--rule);padding:7px 10px 7px 0;text-align:left;vertical-align:top}
+.summary th{font-weight:600;border-bottom:1.5px solid var(--ink)}
+.tablewrap{overflow-x:auto}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="sheet">
+  <div class="bib"><span><span class="inid">(19)</span>무효 클레임차트 작성</span></div>
+
+  <section id="home">
+    <h1>특허번호를 넣으면<br>무효 클레임차트가 나옵니다</h1>
+    <p class="lede">담당자가 요청을 확인해 승인하면, 선행문헌을 찾아 독립항과 종속항을 구성별로 대비한 차트를 PPT와 PDF로 만들어 드립니다.</p>
+    <form id="req" novalidate>
+      <div class="mark">
+        <span class="tag">(11) 등록번호 · (21) 출원번호</span>
+        <div class="row">
+          <input id="num" inputmode="numeric" autocomplete="off" placeholder="10-2102959" aria-label="특허번호">
+          <button id="go" type="submit">요청하기</button>
+        </div>
+      </div>
+      <p class="hint" id="numHint">한국 특허의 등록번호 또는 출원번호를 넣어 주세요.</p>
+      <div class="who">
+        <label for="who">요청자 (선택)</label>
+        <input id="who" autocomplete="name" maxlength="40" placeholder="이름 또는 소속">
+      </div>
+    </form>
+    <div class="mine" id="mine" hidden>
+      <h2>내 요청</h2>
+      <div id="mineList"></div>
+    </div>
+  </section>
+
+  <section id="job" hidden>
+    <button class="ghost" id="back" type="button" style="margin-top:22px">← 새 요청</button>
+    <div class="job-head">
+      <div>
+        <div class="meta"><span class="inid">(11)</span>대상 특허</div>
+        <h1 id="jobNum">불러오는 중</h1>
+        <div class="meta" id="jobMeta"></div>
+      </div>
+      <div class="stamp" id="stamp">작성<br>완료</div>
+    </div>
+    <ol class="track" id="track"></ol>
+    <div class="state" id="state"></div>
+    <div class="files" id="files"></div>
+    <div class="keep" id="keep"><span>이 주소로 언제든 결과를 확인할 수 있습니다.</span><code id="link"></code><button type="button" id="copy">주소 복사</button></div>
+    <div class="summary" id="summary" hidden></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+const SB_URL = "https://iulwvwzclroqbkbdohoa.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1bHd2d3pjbHJvcWJrYmRvaG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5OTAwMTcsImV4cCI6MjExMDU2NjAxN30.Lxuvp267iWbm4ijeQy4dx7rUFk5lCqFnZzM8Kkwz_9Y";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const store = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const STAGES = ["대상 특허 확인", "선행문헌 검색", "문헌 대비", "차트 작성", "마무리"];
+const LABEL = { pending: "승인 대기", approved: "승인됨", running: "작성 중", done: "완료", rejected: "반려", error: "작성 실패" };
+const NUM_HINT = "한국 특허의 등록번호 또는 출원번호를 넣어 주세요.";
+let timer = null, curId = null;
+
+async function rpc(fn, args) {
+  const c = new AbortController(); const t = setTimeout(() => c.abort(), 10000);
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
+      method: "POST", signal: c.signal, cache: "no-store",
+      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(args)
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok) { const e = new Error((j && j.message) || "request_failed"); e.status = r.status; throw e; }
+    return j;
+  } finally { clearTimeout(t); }
+}
+async function getReq(id) { const rows = await rpc("get_request", { p_id: id }); return Array.isArray(rows) ? rows[0] : rows; }
+
+function normalize(raw) {
+  const s = String(raw || "").replace(/^\s*KR/i, "").replace(/\s*[AB]\d?\s*$/i, "");
+  const d = s.replace(/\D/g, "");
+  if (d.length === 9 && d.startsWith("10")) return `10-${d.slice(2)}`;
+  if (d.length === 13 && d.startsWith("10")) return `10-${d.slice(2, 6)}-${d.slice(6)}`;
+  return null;
+}
+function numHint(msg, err) { $("numHint").textContent = msg; $("numHint").className = "hint" + (err ? " err" : ""); $("num").classList.toggle("bad", !!err); }
+const when = iso => { const d = new Date(iso); return `${d.getMonth() + 1}.${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+const mins = (a, b) => Math.max(1, Math.round(((b ? new Date(b) : new Date()) - new Date(a)) / 60000));
+
+function remember(id, number) {
+  const h = store.get("mine", []).filter(x => x.id !== id);
+  h.unshift({ id, number });
+  store.set("mine", h.slice(0, 10));
+}
+async function renderMine() {
+  const h = store.get("mine", []);
+  $("mine").hidden = !h.length;
+  $("mineList").innerHTML = h.map(x => `<a href="#${esc(x.id)}" data-id="${esc(x.id)}"><span>KR ${esc(x.number)}</span><span class="chip" data-chip>확인 중</span></a>`).join("");
+  for (const x of h) {
+    try {
+      const r = await getReq(x.id);
+      const el = $("mineList").querySelector(`[data-id="${x.id}"] [data-chip]`);
+      if (!el) continue;
+      if (!r) { el.textContent = "없음"; el.className = "chip"; continue; }
+      el.textContent = LABEL[r.status] || r.status; el.className = "chip " + r.status;
+    } catch {}
+  }
+}
+
+$("req").addEventListener("submit", async e => {
+  e.preventDefault();
+  const number = normalize($("num").value);
+  if (!number) { numHint("한국 특허번호 형식이 아닙니다. 예: 10-2102959", true); $("num").focus(); return; }
+  $("go").disabled = true; $("go").textContent = "접수 중";
+  try {
+    const id = await rpc("submit_request", { p_number: number, p_requester: $("who").value.trim() || null });
+    store.set("who", $("who").value.trim());
+    remember(id, number);
+    $("num").value = ""; numHint(NUM_HINT);
+    location.hash = id;
+  } catch (err) {
+    const m = String(err.message || "");
+    numHint(m.includes("invalid_number") ? "한국 특허번호 형식이 아닙니다. 예: 10-2102959"
+      : m.includes("too_many") ? "오늘 받을 수 있는 요청이 모두 찼습니다. 내일 다시 요청해 주세요."
+      : "지금은 요청을 보낼 수 없습니다. 잠시 후 다시 시도해 주세요.", true);
+  } finally { $("go").disabled = false; $("go").textContent = "요청하기"; }
+});
+$("num").addEventListener("input", () => { if ($("num").classList.contains("bad")) numHint(NUM_HINT); });
+$("who").value = store.get("who", "");
+
+function renderTrack(st) {
+  const steps = ["접수", "승인", "작성", "완료"];
+  const at = { pending: 1, approved: 2, running: 2, done: 4, rejected: 1, error: 2 }[st] ?? 0;
+  $("track").innerHTML = steps.map((s, i) => {
+    let c = "";
+    if (st === "done" || i < at) c = "done";
+    else if (i === at && st !== "rejected" && st !== "error") c = "now" + (st === "pending" || st === "approved" ? " waiting" : "");
+    return `<li class="${c}">${s}</li>`;
+  }).join("");
+}
+function renderState(r) {
+  let cls = "", html = "";
+  if (r.status === "pending") {
+    cls = "waiting";
+    html = `<b>담당자의 승인을 기다리고 있습니다.</b>요청이 접수되었습니다. 승인되면 이 화면에서 바로 진행 상황을 볼 수 있어요.`;
+  } else if (r.status === "approved") {
+    cls = "waiting";
+    html = r.ahead > 0 ? `<b>승인되었습니다. 앞의 ${r.ahead}건이 끝나면 작성을 시작합니다.</b>순서가 되면 자동으로 시작됩니다.` : `<b>승인되었습니다. 곧 작성을 시작합니다.</b>`;
+  } else if (r.status === "running") {
+    cls = "running";
+    const k = Math.min(r.stage || 0, 4);
+    html = `<b>작성 중입니다 — ${STAGES[k]}</b><div class="sub">${k + 1} / 5 단계 · ${mins(r.started_at)}분째</div><div class="bar"><i style="width:${(k + 0.5) / 5 * 100}%"></i></div>`;
+  } else if (r.status === "done") {
+    cls = "done";
+    html = `<b>작성이 끝났습니다.</b>아래에서 PPT와 PDF를 내려받으세요.`;
+  } else if (r.status === "rejected") {
+    cls = "off";
+    html = `<b>요청이 반려되었습니다.</b>${r.message ? esc(r.message) : "필요하면 담당자에게 문의해 주세요."}`;
+  } else if (r.status === "error") {
+    cls = "off";
+    html = `<b>작성하지 못했습니다.</b>${esc(r.message || "담당자가 확인 중입니다.")}`;
+  }
+  $("state").className = "state " + cls; $("state").innerHTML = html;
+}
+async function poll(id) {
+  clearTimeout(timer);
+  if (id !== curId) return;
+  try {
+    const r = await getReq(id);
+    if (id !== curId) return;
+    if (!r) {
+      $("jobNum").textContent = "요청을 찾을 수 없습니다"; $("jobMeta").textContent = "주소가 잘못되었거나 오래된 요청입니다.";
+      $("track").innerHTML = ""; $("state").className = "state off"; $("state").innerHTML = "<b>새로 요청해 주세요.</b>"; $("keep").hidden = true; return;
+    }
+    $("jobNum").textContent = "KR " + r.number;
+    $("jobMeta").textContent = `${when(r.created_at)} 접수` + (r.status === "done" && r.started_at ? `  /  ${mins(r.started_at, r.finished_at)}분 걸림` : "");
+    renderTrack(r.status); renderState(r);
+    const files = r.status === "done" ? (r.files || []).slice().sort((a, b) => a.kind === "pptx" ? -1 : 1) : [];
+    $("files").innerHTML = files.map(f => `<a class="${f.kind === "pdf" ? "pdf" : ""}" href="${esc(f.url)}?download=${encodeURIComponent(f.name || "")}">${f.kind === "pdf" ? "PDF" : "PPT"} 내려받기 <small>${f.kind === "pdf" ? "인쇄·열람용" : "편집용"}</small></a>`).join("");
+    $("stamp").classList.toggle("show", r.status === "done");
+    $("summary").hidden = !(r.status === "done" && r.summary);
+    if (r.status === "done" && r.summary) $("summary").innerHTML = md(r.summary);
+    $("keep").hidden = false;
+    const wait = { pending: 20000, approved: 10000, running: 10000 }[r.status];
+    if (wait) timer = setTimeout(() => poll(id), wait);
+  } catch {
+    $("state").className = "state off";
+    $("state").innerHTML = "<b>상태를 불러오지 못했습니다.</b>잠시 후 자동으로 다시 확인합니다.";
+    timer = setTimeout(() => poll(id), 30000);
+  }
+}
+$("back").onclick = () => { location.hash = ""; };
+$("copy").onclick = async () => { try { await navigator.clipboard.writeText(location.href); $("copy").textContent = "복사됨"; setTimeout(() => $("copy").textContent = "주소 복사", 1500); } catch {} };
+
+function inline(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "$1"); }
+function md(src) {
+  const L = String(src).replace(/\r/g, "").split("\n"); let h = "", i = 0;
+  while (i < L.length) {
+    const l = L[i];
+    if (/^\s*\|/.test(l)) {
+      const rows = []; while (i < L.length && /^\s*\|/.test(L[i])) rows.push(L[i++]);
+      const cells = r => r.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+      const body = rows.filter(r => !/^\s*\|[\s:|-]+\|\s*$/.test(r));
+      if (body.length) h += `<div class="tablewrap"><table><tr>${cells(body[0]).map(c => `<th>${inline(c)}</th>`).join("")}</tr>${body.slice(1).map(r => `<tr>${cells(r).map(c => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</table></div>`;
+      continue;
+    }
+    let m;
+    if ((m = l.match(/^(#{1,4})\s+(.*)/))) { const n = Math.min(4, m[1].length + 1); h += `<h${n}>${inline(m[2])}</h${n}>`; }
+    else if (/^\s*[-*]\s+/.test(l)) { let li = ""; while (i < L.length && /^\s*[-*]\s+/.test(L[i])) li += `<li>${inline(L[i++].replace(/^\s*[-*]\s+/, ""))}</li>`; h += `<ul>${li}</ul>`; continue; }
+    else if (l.trim()) h += `<p>${inline(l)}</p>`;
+    i++;
+  }
+  return h;
+}
+
+function route() {
+  clearTimeout(timer);
+  const id = location.hash.slice(1);
+  curId = /^[0-9a-f-]{36}$/.test(id) ? id : null;
+  $("home").hidden = !!curId; $("job").hidden = !curId;
+  if (curId) {
+    const known = store.get("mine", []).find(x => x.id === curId);
+    $("jobNum").textContent = known ? "KR " + known.number : "불러오는 중"; $("jobMeta").textContent = "";
+    $("files").innerHTML = ""; $("summary").hidden = true; $("stamp").classList.remove("show");
+    $("state").className = "state"; $("state").innerHTML = ""; $("track").innerHTML = "";
+    $("link").textContent = location.href;
+    poll(curId);
+  } else { renderMine(); }
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>

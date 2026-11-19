@@ -42,6 +42,7 @@ button.ghost:hover{color:var(--ink);background:none}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--mark);outline-offset:3px}
 .hint{font-size:13.5px;color:var(--ink-2);margin:10px 2px 0}
 .hint.err{color:var(--mark)}
+.notice{font-size:13.5px;color:var(--ink);margin:8px 2px 0;padding-left:10px;border-left:3px solid var(--mark)}
 
 .mine{margin-top:40px}
 .mine h2{font:600 15px/1 var(--serif);margin:0 0 6px}
@@ -132,6 +133,7 @@ ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
         </div>
       </div>
       <p class="hint" id="numHint">출원·공개·등록번호 아무거나 괜찮습니다. 해외는 국가코드를 붙여 주세요. 예: 10-2102959 · 10-2020-0000410 · US 12,196,316 · EP 3456789 · CN 112345678 B</p>
+      <p class="notice">공개(또는 등록)된 특허만 요청할 수 있습니다. 아직 공개되지 않은 출원이나 회사 내부 정보는 입력하지 마세요.</p>
       <div class="who">
         <label for="who">요청자 (선택)</label>
         <input id="who" autocomplete="name" maxlength="40" placeholder="이름 또는 소속">

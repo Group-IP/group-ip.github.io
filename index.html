@@ -34,6 +34,8 @@ input.bad{border-bottom-color:var(--mark)}
 .who{margin-top:22px}
 .who label{display:block;font-size:13.5px;color:var(--ink-2)}
 .who input{font-size:17px;max-width:320px;width:100%}
+.who input.bad{border-bottom-color:var(--mark)}
+#whoHint{color:var(--mark)}
 button{font:600 16px/1 var(--sans);color:#fff;background:var(--ink);border:0;padding:15px 22px;cursor:pointer;white-space:nowrap}
 button:hover{background:#2A3850}
 button:disabled{background:#8A94A1;cursor:default}
@@ -135,8 +137,9 @@ ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
       <p class="hint" id="numHint">출원·공개·등록번호 아무거나 괜찮습니다. 해외는 국가코드를 붙여 주세요. 예: 10-2102959 · 10-2020-0000410 · US 12,196,316 · EP 3456789 · CN 112345678 B</p>
       <p class="notice">공개(또는 등록)된 특허만 요청할 수 있습니다. 아직 공개되지 않은 출원이나 회사 내부 정보는 입력하지 마세요.</p>
       <div class="who">
-        <label for="who">요청자 (선택)</label>
-        <input id="who" autocomplete="name" maxlength="40" placeholder="이름 또는 소속">
+        <label for="who">요청자</label>
+        <input id="who" autocomplete="name" maxlength="40" placeholder="이름 (필수)" required aria-required="true">
+        <p class="hint" id="whoHint" hidden>요청자 이름을 적어 주세요.</p>
       </div>
     </form>
     <div class="mine" id="mine" hidden>
@@ -227,9 +230,11 @@ $("req").addEventListener("submit", async e => {
   e.preventDefault();
   const number = normalize($("num").value);
   if (!number) { numHint("번호를 확인해 주세요. 숫자 5자리 이상, 예: 10-2102959 · US 12,196,316", true); $("num").focus(); return; }
+  const who = $("who").value.trim();
+  if (!who) { $("whoHint").hidden = false; $("who").classList.add("bad"); $("who").focus(); return; }
   $("go").disabled = true; $("go").textContent = "접수 중";
   try {
-    const id = await rpc("submit_request", { p_number: number, p_requester: $("who").value.trim() || null });
+    const id = await rpc("submit_request", { p_number: number, p_requester: who });
     store.set("who", $("who").value.trim());
     remember(id, number);
     $("num").value = ""; numHint(NUM_HINT);
@@ -237,6 +242,7 @@ $("req").addEventListener("submit", async e => {
   } catch (err) {
     const m = String(err.message || "");
     numHint(m.includes("invalid_number") ? "번호를 확인해 주세요. 숫자 5자리 이상, 예: 10-2102959 · US 12,196,316"
+      : m.includes("requester_required") ? "요청자 이름을 적어 주세요."
       : m.includes("too_many") ? "오늘 받을 수 있는 요청이 모두 찼습니다. 내일 다시 요청해 주세요."
       : "지금은 요청을 보낼 수 없습니다. 잠시 후 다시 시도해 주세요.", true);
   } finally { $("go").disabled = false; $("go").textContent = "요청하기"; }
@@ -248,6 +254,7 @@ $("num").addEventListener("input", () => {
   else numHint(NUM_HINT, false);
 });
 $("who").value = store.get("who", "");
+$("who").addEventListener("input", () => { if ($("who").value.trim()) { $("whoHint").hidden = true; $("who").classList.remove("bad"); } });
 
 function renderTrack(st) {
   const steps = ["접수", "승인", "작성", "완료"];

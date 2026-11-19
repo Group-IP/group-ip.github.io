@@ -111,17 +111,17 @@ ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
   <div class="bib"><span>무효 클레임차트 작성</span></div>
 
   <section id="home">
-    <h1>특허번호를 넣으면<br>무효 클레임차트가 나옵니다</h1>
+    <h1>출원번호를 넣으면<br>무효 클레임차트가 나옵니다</h1>
     <p class="lede">담당자가 요청을 확인해 승인하면, 선행문헌을 찾아 독립항과 종속항을 구성별로 대비한 차트를 PPT와 PDF로 만들어 드립니다.</p>
     <form id="req" novalidate>
       <div class="mark">
-        <span class="tag">등록번호 또는 출원번호</span>
+        <span class="tag">출원번호</span>
         <div class="row">
-          <input id="num" inputmode="numeric" autocomplete="off" placeholder="10-2102959" aria-label="특허번호">
+          <input id="num" inputmode="numeric" autocomplete="off" placeholder="10-2020-0000410" aria-label="출원번호">
           <button id="go" type="submit">요청하기</button>
         </div>
       </div>
-      <p class="hint" id="numHint">한국 특허의 등록번호 또는 출원번호를 넣어 주세요.</p>
+      <p class="hint" id="numHint">한국은 번호만(10-2020-0000410), 해외는 국가코드를 붙여 주세요. 예: US 16/123,456 · JP 2019-123456 · CN 202110123456.X · EP 19123456.7 · PCT/KR2020/001234</p>
       <div class="who">
         <label for="who">요청자 (선택)</label>
         <input id="who" autocomplete="name" maxlength="40" placeholder="이름 또는 소속">
@@ -163,7 +163,7 @@ const store = {
 };
 const STAGES = ["대상 특허 확인", "선행문헌 검색", "문헌 대비", "차트 작성", "마무리"];
 const LABEL = { pending: "승인 대기", approved: "승인됨", running: "작성 중", done: "완료", rejected: "반려", error: "작성 실패" };
-const NUM_HINT = "한국 특허의 등록번호 또는 출원번호를 넣어 주세요.";
+const NUM_HINT = "한국은 번호만(10-2020-0000410), 해외는 국가코드를 붙여 주세요. 예: US 16/123,456 · JP 2019-123456 · CN 202110123456.X · EP 19123456.7 · PCT/KR2020/001234";
 let timer = null, curId = null;
 
 async function rpc(fn, args) {
@@ -182,10 +182,20 @@ async function rpc(fn, args) {
 async function getReq(id) { const rows = await rpc("get_request", { p_id: id }); return Array.isArray(rows) ? rows[0] : rows; }
 
 function normalize(raw) {
-  const s = String(raw || "").replace(/^\s*KR/i, "").replace(/\s*[AB]\d?\s*$/i, "");
-  const d = s.replace(/\D/g, "");
-  if (d.length === 9 && d.startsWith("10")) return `10-${d.slice(2)}`;
-  if (d.length === 13 && d.startsWith("10")) return `10-${d.slice(2, 6)}-${d.slice(6)}`;
+  // 출원번호만: KR 10-2020-0000410 / US 16/123,456 / JP 2019-123456 / CN 202110123456.X / EP 19123456.7 / PCT/KR2020/001234
+  const s = String(raw || "").toUpperCase().replace(/\s/g, "");
+  if (/^(PCT|WO)/.test(s)) {
+    const m = s.replace(/^(PCT|WO)\/?/, "").match(/^([A-Z]{2})\/?(\d{4})\/?(\d{6})$/);
+    return m ? `PCT/${m[1]}${m[2]}/${m[3]}` : null;
+  }
+  const cc = (s.match(/^(KR|US|JP|CN|EP)/) || [])[1] || "KR";
+  const rest = s.replace(/^(KR|US|JP|CN|EP)/, "");
+  const d = rest.replace(/\D/g, "");
+  if (cc === "KR") return d.length === 13 && /^(10|20)/.test(d) ? `KR ${d.slice(0, 2)}-${d.slice(2, 6)}-${d.slice(6)}` : null;
+  if (cc === "US") return d.length === 8 ? `US ${d.slice(0, 2)}/${d.slice(2, 5)},${d.slice(5)}` : null;
+  if (cc === "JP") return d.length === 10 ? `JP ${d.slice(0, 4)}-${d.slice(4)}` : null;
+  if (cc === "CN") { const x = rest.replace(/[^0-9X]/g, ""); return /^\d{12}[0-9X]?$/.test(x) ? `CN ${x.slice(0, 12)}${x.length === 13 ? "." + x[12] : ""}` : null; }
+  if (cc === "EP") return d.length === 8 ? `EP ${d}` : d.length === 9 ? `EP ${d.slice(0, 8)}.${d[8]}` : null;
   return null;
 }
 function numHint(msg, err) { $("numHint").textContent = msg; $("numHint").className = "hint" + (err ? " err" : ""); $("num").classList.toggle("bad", !!err); }
@@ -200,7 +210,7 @@ function remember(id, number) {
 async function renderMine() {
   const h = store.get("mine", []);
   $("mine").hidden = !h.length;
-  $("mineList").innerHTML = h.map(x => `<a href="#${esc(x.id)}" data-id="${esc(x.id)}"><span>KR ${esc(x.number)}</span><span class="chip" data-chip>확인 중</span></a>`).join("");
+  $("mineList").innerHTML = h.map(x => `<a href="#${esc(x.id)}" data-id="${esc(x.id)}"><span>${esc(x.number)}</span><span class="chip" data-chip>확인 중</span></a>`).join("");
   for (const x of h) {
     try {
       const r = await getReq(x.id);
@@ -215,7 +225,7 @@ async function renderMine() {
 $("req").addEventListener("submit", async e => {
   e.preventDefault();
   const number = normalize($("num").value);
-  if (!number) { numHint("한국 특허번호 형식이 아닙니다. 예: 10-2102959", true); $("num").focus(); return; }
+  if (!number) { numHint("출원번호 형식을 확인해 주세요. 예: 10-2020-0000410, US 16/123,456, EP 19123456.7", true); $("num").focus(); return; }
   $("go").disabled = true; $("go").textContent = "접수 중";
   try {
     const id = await rpc("submit_request", { p_number: number, p_requester: $("who").value.trim() || null });
@@ -225,12 +235,17 @@ $("req").addEventListener("submit", async e => {
     location.hash = id;
   } catch (err) {
     const m = String(err.message || "");
-    numHint(m.includes("invalid_number") ? "한국 특허번호 형식이 아닙니다. 예: 10-2102959"
+    numHint(m.includes("invalid_number") ? "출원번호 형식을 확인해 주세요. 예: 10-2020-0000410, US 16/123,456, EP 19123456.7"
       : m.includes("too_many") ? "오늘 받을 수 있는 요청이 모두 찼습니다. 내일 다시 요청해 주세요."
       : "지금은 요청을 보낼 수 없습니다. 잠시 후 다시 시도해 주세요.", true);
   } finally { $("go").disabled = false; $("go").textContent = "요청하기"; }
 });
-$("num").addEventListener("input", () => { if ($("num").classList.contains("bad")) numHint(NUM_HINT); });
+$("num").addEventListener("input", () => {
+  const v = $("num").value.trim(), n = normalize(v);
+  if (!v) numHint(NUM_HINT);
+  else if (n) numHint(`${n} 출원번호로 요청합니다. 등록번호·공개번호가 아니라 출원번호인지 확인해 주세요.`);
+  else numHint(NUM_HINT, false);
+});
 $("who").value = store.get("who", "");
 
 function renderTrack(st) {
@@ -277,7 +292,7 @@ async function poll(id) {
       $("jobNum").textContent = "요청을 찾을 수 없습니다"; $("jobMeta").textContent = "주소가 잘못되었거나 오래된 요청입니다.";
       $("track").innerHTML = ""; $("state").className = "state off"; $("state").innerHTML = "<b>새로 요청해 주세요.</b>"; $("keep").hidden = true; return;
     }
-    $("jobNum").textContent = "KR " + r.number;
+    $("jobNum").textContent = r.number;
     $("jobMeta").textContent = `${when(r.created_at)} 접수` + (r.status === "done" && r.started_at ? `  /  ${mins(r.started_at, r.finished_at)}분 걸림` : "");
     renderTrack(r.status); renderState(r);
     const files = r.status === "done" ? (r.files || []).slice().sort((a, b) => a.kind === "pptx" ? -1 : 1) : [];
@@ -325,7 +340,7 @@ function route() {
   $("home").hidden = !!curId; $("job").hidden = !curId;
   if (curId) {
     const known = store.get("mine", []).find(x => x.id === curId);
-    $("jobNum").textContent = known ? "KR " + known.number : "불러오는 중"; $("jobMeta").textContent = "";
+    $("jobNum").textContent = known ? known.number : "불러오는 중"; $("jobMeta").textContent = "";
     $("files").innerHTML = ""; $("summary").hidden = true; $("stamp").classList.remove("show");
     $("state").className = "state"; $("state").innerHTML = ""; $("track").innerHTML = "";
     $("link").textContent = location.href;

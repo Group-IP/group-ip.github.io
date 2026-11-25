@@ -50,6 +50,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .mine h2{font:600 15px/1 var(--serif);margin:0 0 6px}
 .mine a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none;font-variant-numeric:tabular-nums}
 .mine a:hover{background:#F5F7F9}
+.mine .mdate{color:var(--ink-2);font-size:13px;margin-left:6px}
 .chip{font-size:13px;padding:3px 9px;border:1.5px solid currentColor;white-space:nowrap;color:var(--ink-2)}
 .chip.pending,.chip.approved{color:var(--wait)}
 .chip.running,.chip.choose{color:var(--mark)}
@@ -117,6 +118,61 @@ ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
 .cand .ct{font-size:15px}
 .cand .cm{font-size:13px;color:var(--ink-2)}
 [hidden]{display:none!important}
+
+/* ---- 작업 기록 (실제 기록만 표시) ---- */
+.live{margin-top:30px;border-top:3px double var(--ink);padding-top:10px}
+.live-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.live-h h2{font:600 17px/1.4 var(--serif);margin:0}
+.live-note{font-size:12.5px;color:var(--ink-2)}
+.now{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px}
+.now .pill{font-size:13px;padding:3px 10px;border:1.5px solid currentColor;white-space:nowrap}
+.now .pill.db{color:var(--mark)}.now .pill.run{color:var(--done)}.now .pill.ai{color:var(--ink-2)}.now .pill.end{color:var(--done)}
+.now .sub2{color:var(--ink-2);font-size:13px;font-variant-numeric:tabular-nums}
+.kpi{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--rule);margin-top:14px;border:1px solid var(--rule)}
+.kpi div{background:var(--sheet);padding:8px 10px}
+.kpi b{display:block;font:600 19px/1.2 var(--sans);font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--ink-2)}
+@media (max-width:600px){.kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.cand-t{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:16px;font-size:13px;font-variant-numeric:tabular-nums}
+.cand-t th{font-weight:500;color:var(--ink-2);font-size:12px;text-align:left;border-bottom:1.5px solid var(--ink);padding:5px 6px 5px 0}
+.cand-t td{border-bottom:1px solid var(--rule);padding:5px 6px 5px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
+.cand-t td.el{text-align:center;font-size:12px;color:var(--done)}
+.cand-t td.el.no{color:var(--mark)}
+.cand-t tr.pin td{background:#F5F7F9}
+.cand-t tr.out td{color:#9AA3AE}
+.badge{display:inline-block;font-size:11px;padding:0 5px;margin:0 3px 0 0;border:1px solid var(--rule);color:var(--ink-2)}
+.badge.d{border-color:var(--done);color:var(--done)}
+@keyframes rowin{from{background:#FBF1F1}to{background:transparent}}
+.cand-t tr.fresh td{animation:rowin 1.4s ease}
+.cand-more{font-size:12.5px;color:var(--ink-2);margin-top:6px}
+.live-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;margin-top:18px}
+@media (max-width:600px){.live-grid{grid-template-columns:1fr}}
+.cap{font-size:12px;color:var(--ink-2);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.viewer{position:relative;height:250px;border:1px solid var(--rule);background:#FAFBFC;overflow:hidden}
+.viewer .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .45s cubic-bezier(.4,0,.2,1),opacity .45s}
+.viewer img{max-width:100%;max-height:100%;object-fit:contain}
+.viewer .empty{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:#9AA3AE;text-align:center;padding:10px}
+.vcap{display:flex;justify-content:space-between;font-size:12.5px;margin-top:5px;gap:8px}
+.vcap b{font-weight:600}
+.strip{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin-top:6px}
+.strip button{padding:0;background:#FAFBFC;border:1px solid var(--rule);height:38px;overflow:hidden;cursor:pointer}
+.strip button.on{border-color:var(--mark)}
+.strip img{width:100%;height:100%;object-fit:cover}
+.feed{font-size:13px;line-height:1.55;max-height:330px;overflow:hidden}
+.feed div{padding:5px 0;border-bottom:1px solid #EEF0F3}
+.feed .t{color:#9AA3AE;font-variant-numeric:tabular-nums;margin-right:6px;font-size:12px}
+.feed .q{display:block;font:12px/1.45 ui-monospace,Consolas,monospace;color:var(--ink-2);word-break:break-all;margin-top:2px}
+.feed .memo{font-family:var(--serif);color:var(--ink)}
+.steps{margin-top:16px;font-size:13px;display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--ink-2)}
+.steps span.ok::before{content:"✓ ";color:var(--done)}
+.steps span.go{color:var(--mark)}
+.tbar{margin-top:16px}
+.tbar .tr{position:relative;height:8px;background:#EEF0F3;overflow:hidden}
+.tbar .tr i{position:absolute;top:0;height:8px}
+.tbar .lg{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-2);margin-top:5px;flex-wrap:wrap}
+.vrf{margin-top:12px;font-size:13px;padding:8px 10px;border-left:3px solid var(--done);background:#EEF6F2}
+.vrf.bad{border-left-color:var(--mark);background:#FBF1F1}
+details.live-old summary{cursor:pointer;font:600 15px/1.4 var(--serif);margin-top:30px}
 </style>
 </head>
 <body>
@@ -143,7 +199,7 @@ ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
       </div>
     </form>
     <div class="mine" id="mine" hidden>
-      <h2>내 요청</h2>
+      <h2>내 요청 <small class="mdate">요청자 이름으로 찾은 최근 요청</small></h2>
       <div id="mineList"></div>
     </div>
   </section>
@@ -160,6 +216,30 @@ ol.track li.now.waiting::before{border-color:var(--wait);color:var(--wait)}
     </div>
     <ol class="track" id="track"></ol>
     <div class="state" id="state"></div>
+    <div id="liveWrap" hidden>
+      <div class="live" id="live">
+        <div class="live-h"><h2>작업 기록</h2><span class="live-note">실제 도구 호출과 파일만 표시합니다. 기록이 없는 동안에는 화면도 멈춰 있습니다.</span></div>
+        <div class="now" id="lvNow"></div>
+        <div class="kpi" id="lvKpi"></div>
+        <table class="cand-t" id="lvTable"></table>
+        <div class="cand-more" id="lvMore"></div>
+        <div class="live-grid">
+          <div>
+            <div class="cap"><span>도면 검토 — AI가 연 이미지</span><span id="lvVcount"></span></div>
+            <div class="viewer" id="lvView"><div class="empty">도면은 인용 문헌이 정해진 뒤 검토합니다</div></div>
+            <div class="vcap"><b id="lvCap"></b><span id="lvRole" style="color:var(--ink-2)"></span></div>
+            <div class="strip" id="lvStrip"></div>
+          </div>
+          <div>
+            <div class="cap"><span>실시간 기록</span></div>
+            <div class="feed" id="lvFeed"></div>
+          </div>
+        </div>
+        <div class="steps" id="lvSteps"></div>
+        <div class="tbar"><div class="tr" id="lvBar"></div><div class="lg" id="lvBarLg"></div></div>
+        <div id="lvVerify"></div>
+      </div>
+    </div>
     <div class="files" id="files"></div>
     <div class="keep" id="keep"><span>이 주소로 언제든 결과를 확인할 수 있습니다.</span><code id="link"></code><button type="button" id="copy">주소 복사</button></div>
     <div class="summary" id="summary" hidden></div>
@@ -212,19 +292,21 @@ function remember(id, number) {
   store.set("mine", h.slice(0, 10));
 }
 async function renderMine() {
-  const h = store.get("mine", []);
-  $("mine").hidden = !h.length;
-  $("mineList").innerHTML = h.map(x => `<a href="#${esc(x.id)}" data-id="${esc(x.id)}"><span>${esc(x.number)}</span><span class="chip" data-chip>확인 중</span></a>`).join("");
-  for (const x of h) {
-    try {
-      const r = await getReq(x.id);
-      const el = $("mineList").querySelector(`[data-id="${x.id}"] [data-chip]`);
-      if (!el) continue;
-      if (!r) { el.textContent = "없음"; el.className = "chip"; continue; }
-      el.textContent = LABEL[r.status] || r.status; el.className = "chip " + r.status;
-    } catch {}
+  const who = $("who").value.trim();
+  const byId = new Map();
+  if (who) {
+    try { (await rpc("list_my_requests", { p_requester: who }) || []).forEach(r => byId.set(r.id, r)); } catch {}
   }
+  const rows = [...byId.values()].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).slice(0, 20);
+  $("mine").hidden = !rows.length;
+  $("mineList").innerHTML = rows.map(r => {
+    const t = r.target;
+    const label = t ? `${t.cc} ${t.doc_no}` : r.number;
+    return `<a href="#${esc(r.id)}"><span>${esc(label)}<small class="mdate"> ${r.created_at ? when(r.created_at) : ""}</small></span><span class="chip ${esc(r.status)}">${esc(LABEL[r.status] || r.status)}</span></a>`;
+  }).join("");
 }
+let mineTimer = null;
+$("who").addEventListener("input", () => { clearTimeout(mineTimer); mineTimer = setTimeout(renderMine, 600); });
 
 $("req").addEventListener("submit", async e => {
   e.preventDefault();
@@ -313,6 +395,9 @@ async function poll(id) {
     $("jobNum").textContent = t ? `${t.cc} ${t.doc_no}` : r.number;
     $("jobMeta").textContent = `${when(r.created_at)} 접수` + (r.status === "done" && r.started_at ? `  /  ${mins(r.started_at, r.finished_at)}분 걸림` : "") + (t && t.title ? `  /  ${t.title}` : "");
     renderTrack(r.status); renderState(r);
+    // 작업 기록: 작성 중에는 상태 바로 아래, 끝난 뒤에는 결과·요약 아래로
+    if (r.status === "running") $("state").after($("liveWrap")); else $("job").appendChild($("liveWrap"));
+    lvStart(r);
     const files = r.status === "done" ? (r.files || []).slice().sort((a, b) => a.kind === "pptx" ? -1 : 1) : [];
     $("files").innerHTML = files.map(f => `<a class="${f.kind === "pdf" ? "pdf" : ""}" href="${esc(f.url)}?download=${encodeURIComponent(f.name || "")}">${f.kind === "pdf" ? "PDF" : "PPT"} 내려받기 <small>${f.kind === "pdf" ? "인쇄·열람용" : "편집용"}</small></a>`).join("");
     $("stamp").classList.toggle("show", r.status === "done");
@@ -337,6 +422,179 @@ $("state").addEventListener("click", async e => {
 });
 $("back").onclick = () => { location.hash = ""; };
 $("copy").onclick = async () => { try { await navigator.clipboard.writeText(location.href); $("copy").textContent = "복사됨"; setTimeout(() => $("copy").textContent = "주소 복사", 1500); } catch {} };
+
+// ---------------- 작업 기록: 노트북이 올린 실제 기록(job_events)만으로 그린다 ----------------
+const LV = { id: null, after: 0, ev: [], timer: null, status: null, target: null, seen: new Set(), view: -1, shownUrl: null, recvAt: 0 };
+const SEARCH_TOOLS = ["get_patent_ai_search", "get_patent_aisearch_num", "get_patent_search_onlyengine"];
+const mmss = s => { s = Math.max(0, Math.round(s)); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
+const digitsOf = s => String(s || "").replace(/\D/g, "");
+const sameNo = (a, b) => { const x = digitsOf(a), y = digitsOf(b); return !!x && !!y && (x === y || x.endsWith(y) || y.endsWith(x)); };
+function lvReset(id) {
+  clearTimeout(LV.timer);
+  Object.assign(LV, { id, after: 0, ev: [], timer: null, status: null, seen: new Set(), view: -1, shownUrl: null, recvAt: 0 });
+  $("liveWrap").hidden = true; $("lvView").innerHTML = '<div class="empty">도면은 인용 문헌이 정해진 뒤 검토합니다</div>';
+}
+async function lvFetch() {
+  for (let n = 0; n < 20; n++) {
+    const rows = await rpc("get_events", { p_id: LV.id, p_after: LV.after });
+    if (!Array.isArray(rows) || !rows.length) return;
+    LV.ev.push(...rows); LV.after = rows[rows.length - 1].id; LV.recvAt = Date.now() / 1000;
+    if (rows.length < 500) return;
+  }
+}
+async function lvTick() {
+  clearTimeout(LV.timer);
+  const id = LV.id;
+  try { await lvFetch(); if (id === LV.id && id === curId) lvRender(); } catch {}
+  if (id === LV.id && LV.status === "running") LV.timer = setTimeout(lvTick, 2500);
+}
+function lvStart(r) {
+  if (LV.id !== r.id) lvReset(r.id);
+  const was = LV.status; LV.status = r.status; LV.target = (r.target || {}).skey || null;
+  if (!["running", "done", "error"].includes(r.status)) return;
+  if (r.status === "running" && !LV.timer) lvTick();
+  else if (r.status !== "running" && was !== r.status) lvTick();
+}
+function srcLabel(c) {
+  const i = c.input || {};
+  if (c.tool === "get_patent_ai_search") return "AI " + (i.targetCtry || "");
+  if (c.tool === "get_patent_aisearch_num") return "번호유사 " + (i.targetCtry || "");
+  return /\.(AN|RN|XN|PN)\./i.test(i.query || "") ? "번호지정" : "검색식";
+}
+function lvModel() {
+  let start = 0;
+  LV.ev.forEach((e, i) => { if (e.kind === "job_start") start = i; });
+  const E = LV.ev.slice(start), m = {
+    t0: E.length ? E[0].payload.at : 0, tEnd: null, calls: {}, runs: {}, docs: new Map(), order: [], hits: 0, reads: 0,
+    elements: [], screen: null, cites: [], combo: null, images: [], feed: [], think: 0, thinkAtTool: 0, verify: null, last: 0, byNo: new Map()
+  };
+  for (const e of E) {
+    const p = e.payload || {}, k = e.kind; m.last = Math.max(m.last, p.at || 0);
+    if (k === "db_call") {
+      m.calls[p.id] = Object.assign({ t: p.at }, p); m.thinkAtTool = m.think;
+      m.feed.push({ t: p.at, kind: "db", label: p.label, q: (p.input || {}).query || (p.input || {}).keyword || "" });
+    } else if (k === "db_result") {
+      const c = m.calls[p.id]; if (!c) continue; c.end = p.at; c.res = p;
+      const search = SEARCH_TOOLS.includes(c.tool) && !c.lookup;
+      if (search && p.count) m.hits += p.count;
+      if (c.tool === "get_patent_spec_text" && (c.input || {}).section === "dtl_desc") {
+        m.reads++; const d = m.docs.get((c.input || {}).skey); if (d) d.read = true;
+      }
+      for (const d of p.docs || []) {
+        if (!d.skey || d.skey === LV.target) continue;
+        let x = m.docs.get(d.skey);
+        if (!x && d.no) { const k2 = m.byNo.get((d.cc || "") + digitsOf(d.no)); if (k2) { x = m.docs.get(k2); m.docs.set(d.skey, x); } }
+        if (!x) { if (!search) continue; x = { skey: d.skey, src: new Set() }; m.docs.set(d.skey, x); m.order.push(d.skey); }
+        if (d.no) m.byNo.set((d.cc || "") + digitsOf(d.no), x.skey);
+        for (const f of ["no", "cc", "title", "applicant"]) if (d[f]) x[f] = d[f];
+        const dt = String(d.prd || d.ad || "").split("|")[0].trim(); if (dt) x.date = dt;
+        if (search) x.src.add(srcLabel(c)); else if (c.lookup) x.looked = true;
+      }
+      if (p.error_code) m.feed.push({ t: p.at, kind: "warn", label: `${c.label} — ${p.error_code === "CONCURRENT_CALL" ? "동시 호출 거절, 단독 재시도" : p.error_code}` });
+    } else if (k === "run") {
+      m.runs[p.id] = Object.assign({ t: p.at }, p); m.thinkAtTool = m.think;
+      m.feed.push({ t: p.at, kind: "run", label: p.label, q: p.desc });
+    } else if (k === "run_end") { if (m.runs[p.id]) { m.runs[p.id].end = p.at; m.runs[p.id].ok = p.ok; } }
+    else if (k === "image_view" || k === "image_marked") { m.images.push(p); m.thinkAtTool = m.think; }
+    else if (k === "note") m.feed.push({ t: p.at, kind: "memo", label: p.text });
+    else if (k === "thinking") m.think = p.total || m.think;
+    else if (k === "elements") m.elements = (p.items || []).slice(0, 12);
+    else if (k === "screening") { m.screen = p; m.feed.push({ t: p.at, kind: "rec", label: `스크리닝 기록 — 정독 ${(p.kept || []).length}건, 제외 ${(p.excluded || []).length}건` }); }
+    else if (k === "citations") { m.cites = p.items || []; m.feed.push({ t: p.at, kind: "rec", label: `대비 기록 — 인용 ${m.cites.length}건` }); }
+    else if (k === "combination") { m.combo = p; m.feed.push({ t: p.at, kind: "rec", label: `조합 기록 — 주인용 ${p.main}${(p.subs || []).length ? " + " + p.subs.map(s => s.doc).join(" + ") : ""}${p.motive ? " · " + p.motive : ""}` }); }
+    else if (k === "stage") m.feed.push({ t: p.at, kind: "rec", label: `${p.name || "단계"}${p.result ? " — " + p.result : ""}${p.note ? " · " + p.note : ""}` });
+    else if (k === "verify") m.verify = p;
+    else if (k === "job_end") m.tEnd = p.at;
+  }
+  return m;
+}
+function docState(m, d) {
+  const c = m.cites.filter(x => sameNo(x.no, d.no));
+  if (c.length) return { pin: 1, txt: `${c[0].doc} 인용`, doc: c[0].doc };
+  const s = m.screen || {};
+  if ((s.kept || []).some(x => sameNo(x.no, d.no))) return { pin: 1, txt: d.read ? "전문 읽음" : "정독 대상" };
+  const ex = (s.excluded || []).find(x => sameNo(x.no, d.no));
+  if (ex) return { out: 1, txt: "제외 · " + (ex.reason || "") };
+  if (d.read) return { pin: 1, txt: "전문 읽음" };
+  return { txt: d.looked ? "요약 확인" : "목록" };
+}
+function lvRender() {
+  const m = lvModel();
+  if (!LV.ev.length) { $("liveWrap").hidden = true; return; }
+  $("liveWrap").hidden = false;
+  const running = LV.status === "running" && !m.tEnd;
+  const idle = running ? Math.max(0, Date.now() / 1000 - LV.recvAt) : 0;
+  const nowT = m.tEnd || (m.last + idle);
+  // 지금 하는 일
+  const openC = Object.values(m.calls).filter(c => !c.end), openR = Object.values(m.runs).filter(r => !r.end);
+  let pill, cls, sub = "";
+  if (!running) { pill = m.tEnd ? "작업 끝" : "기록 종료"; cls = "end"; }
+  else if (openC.length) { pill = `특허DB 조회 ${openC.length}건`; cls = "db"; sub = openC.map(c => c.label).join(", "); }
+  else if (openR.length) { pill = "실행 중"; cls = "run"; sub = openR.map(r => r.desc || r.label).join(", "); }
+  else { pill = "AI 분석 중"; cls = "ai"; sub = `도구 호출 없음 · 생각 약 ${(m.think - m.thinkAtTool).toLocaleString()} 토큰`; }
+  const since = running ? ` · 마지막 기록 ${Math.round(idle)}초 전` : "";
+  $("lvNow").innerHTML = `<span class="pill ${cls}">${esc(pill)}</span><span>${esc(sub)}</span><span class="sub2">경과 ${mmss(nowT - m.t0)}${since}</span>`;
+  // 지표
+  const cited = new Set(m.cites.map(c => `${c.doc}${c.para}`)).size;
+  $("lvKpi").innerHTML = [[Object.keys(m.calls).length, "특허DB 호출"], [m.hits, "검색 결과(중복 포함)"], [m.docs.size, "고유 후보 문헌"], [m.reads, "명세서 정독"], [m.cites.length ? cited : "—", "인용 문단"]]
+    .map(([v, l]) => `<div><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join("");
+  // 후보 문헌 표
+  const els = m.elements.length <= 8 ? m.elements : [];
+  const all = m.order.map(k => m.docs.get(k)).filter(d => d.skey !== undefined).map(d => Object.assign({ st: docState(m, d) }, d));
+  const pins = all.filter(d => d.st.pin), outs = all.filter(d => d.st.out), rest = all.filter(d => !d.st.pin && !d.st.out).reverse();
+  const shown = pins.concat(rest).slice(0, Math.max(8, pins.length));
+  const elCell = (d, e) => {
+    if (!d.st.doc) return "<td class='el'></td>";
+    const c = m.cites.find(x => sameNo(x.no, d.no) && x.element === e.id);
+    return c ? `<td class="el" title="${esc(c.doc + " " + c.para)}">¶${esc(String(+digitsOf(c.para) || c.para))}</td>` : "<td class='el no'></td>";
+  };
+  $("lvTable").innerHTML = all.length ? `<tr><th style="width:${els.length ? 20 : 24}%">문헌</th><th>명칭</th><th style="width:11%">우선일</th><th style="width:${els.length ? 17 : 22}%">발견 경로</th>${els.map(e => `<th style="width:6%;text-align:center" title="${esc(e.label)}">${esc(e.id)}</th>`).join("")}<th style="width:14%">상태</th></tr>` +
+    shown.map(d => { const fresh = !LV.seen.has(d.skey); LV.seen.add(d.skey);
+      return `<tr class="${d.st.pin ? "pin" : ""} ${fresh ? "fresh" : ""}"><td title="${esc((d.cc || "") + " " + (d.no || "") + (d.applicant ? " · " + d.applicant : ""))}">${esc((d.cc || "") + " " + (d.no || ""))}</td><td title="${esc(d.title || "")}">${esc(d.title || "—")}</td><td>${esc(d.date ? d.date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2") : "—")}</td><td>${[...d.src].map(s => `<span class="badge">${esc(s)}</span>`).join("")}</td>${els.map(e => elCell(d, e)).join("")}<td>${d.st.doc ? `<span class="badge d">${esc(d.st.txt)}</span>` : esc(d.st.txt)}</td></tr>`; }).join("") : "";
+  const hidden = rest.length - Math.max(0, shown.length - pins.length);
+  const reasons = {}; outs.forEach(d => { const r = d.st.txt.replace("제외 · ", "") || "기타"; reasons[r] = (reasons[r] || 0) + 1; });
+  $("lvMore").textContent = [hidden > 0 ? `검토 중 외 ${hidden}건` : "", outs.length ? `제외 ${outs.length}건 (${Object.entries(reasons).map(([k, v]) => k + " " + v).join(" · ")})` : ""].filter(Boolean).join("  /  ");
+  // 도면 검토
+  const imgs = m.images; $("lvVcount").textContent = imgs.length ? `${imgs.length}장` : "";
+  const idx = LV.view >= 0 && LV.view < imgs.length ? LV.view : imgs.length - 1;
+  if (idx >= 0 && imgs[idx].url !== LV.shownUrl) {
+    const v = $("lvView"), old = v.querySelector(".slide"), s = document.createElement("div");
+    s.className = "slide"; s.style.transform = "translateX(100%)"; s.innerHTML = `<img src="${esc(imgs[idx].url)}" alt="${esc(imgs[idx].caption || "")}">`;
+    v.querySelector(".empty")?.remove(); v.appendChild(s);
+    requestAnimationFrame(() => requestAnimationFrame(() => { s.style.transform = "none"; if (old) { old.style.transform = "translateX(-100%)"; old.style.opacity = 0; setTimeout(() => old.remove(), 500); } }));
+    LV.shownUrl = imgs[idx].url;
+  }
+  if (idx >= 0) { $("lvCap").textContent = imgs[idx].caption || ""; $("lvRole").textContent = imgs[idx].label || ""; }
+  const from = Math.max(0, imgs.length - 8);
+  $("lvStrip").innerHTML = imgs.slice(from).map((im, j) => `<button type="button" data-i="${from + j}" class="${from + j === idx ? "on" : ""}" title="${esc(im.caption || "")}"><img src="${esc(im.url)}" alt=""></button>`).join("");
+  // 실시간 기록
+  $("lvFeed").innerHTML = m.feed.slice(-9).reverse().map(f => {
+    const t = `<span class="t">${mmss(f.t - m.t0)}</span>`;
+    if (f.kind === "memo") return `<div title="${esc(f.label)}">${t}<span class="memo">${esc(f.label.length > 170 ? f.label.slice(0, 170) + "…" : f.label)}</span></div>`;
+    if (f.kind === "warn") return `<div>${t}<span style="color:var(--wait)">${esc(f.label)}</span></div>`;
+    if (f.kind === "rec") return `<div>${t}<b>${esc(f.label)}</b></div>`;
+    return `<div>${t}${esc(f.label)}${f.q ? `<span class="q">${esc(f.q)}</span>` : ""}</div>`;
+  }).join("") || `<div style="color:#9AA3AE">기록을 기다리는 중</div>`;
+  // 실행 단계
+  $("lvSteps").innerHTML = Object.values(m.runs).map(r => `<span class="${r.end ? "ok" : "go"}">${esc(r.label)}</span>`).join("");
+  // 시간 배분 (지나간 구간만)
+  const span = Math.max(1, nowT - m.t0), seg = [];
+  Object.values(m.calls).forEach(c => seg.push([c.t, c.end || nowT, "var(--mark)"]));
+  Object.values(m.runs).forEach(r => seg.push([r.t, r.end || nowT, "var(--done)"]));
+  const cover = col => { const iv = seg.filter(s => s[2] === col).sort((a, b) => a[0] - b[0]); let tot = 0, ce = -1e18; for (const [a, b] of iv) { const s = Math.max(a, ce); if (b > s) tot += b - s; ce = Math.max(ce, b); } return tot; };
+  const dbT = cover("var(--mark)"), runT = cover("var(--done)"), aiT = Math.max(0, span - dbT - runT);
+  $("lvBar").innerHTML = seg.map(([a, b, c]) => `<i style="left:${(a - m.t0) / span * 100}%;width:${Math.max(.3, (b - a) / span * 100)}%;background:${c}"></i>`).join("");
+  $("lvBarLg").innerHTML = `<span><span style="color:var(--mark)">■</span> 특허DB 조회 ${Math.round(dbT / span * 100)}% · <span style="color:var(--done)">■</span> 실행 ${Math.round(runT / span * 100)}% · <span style="color:#C7CDD5">■</span> AI 분석 ${Math.round(aiT / span * 100)}%</span><span>지나간 시간만 표시</span>`;
+  // 대조 결과
+  const vr = m.verify;
+  $("lvVerify").innerHTML = vr ? `<div class="vrf ${vr.ok ? "" : "bad"}">${vr.ok ? `작업 기록의 인용 ${vr.recorded}건과 최종 차트의 인용 ${vr.chart}건이 일치합니다.` :
+    `작업 기록과 최종 차트의 인용이 다릅니다 — 차트에만 있음 ${vr.missing_on_screen.length}건${vr.missing_on_screen.length ? " (" + esc(vr.missing_on_screen.slice(0, 5).join(", ")) + ")" : ""}, 기록에만 있음 ${vr.not_in_chart.length}건. 최종 차트가 기준입니다.`}</div>` : "";
+}
+$("lvStrip").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const i = +b.dataset.i, n = lvModel().images.length;
+  LV.view = i === n - 1 ? -1 : i; lvRender();
+});
 
 function inline(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "$1"); }
 function md(src) {
@@ -364,6 +622,7 @@ function route() {
   const id = location.hash.slice(1);
   curId = /^[0-9a-f-]{36}$/.test(id) ? id : null;
   $("home").hidden = !!curId; $("job").hidden = !curId;
+  lvReset(curId);
   if (curId) {
     const known = store.get("mine", []).find(x => x.id === curId);
     $("jobNum").textContent = known ? known.number : "불러오는 중"; $("jobMeta").textContent = "";
